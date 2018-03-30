@@ -142,20 +142,23 @@ namespace {
 				idx += c.size()/2;
 				c[idx] = std::move(value); //TODO move?
 				while(idx > 1) {
-					c[idx/2] = op(c[idx], c[idx ^ 1]);
+					if(idx % 2 == 0)
+						c[idx/2] = op(c[idx], c[idx + 1]);
+					else
+						c[idx/2] = op(c[idx - 1], c[idx]);
 					idx /= 2;
 				}	
 			}
 
 			T query(size_type left, size_type right) const {
-				T res = T();
+				T result_left, result_right;
 				for (left += c.size()/2, right += c.size()/2; left < right; left /= 2, right /= 2) {
 					if (left % 2) 
-						res = op(res, c[left++]);			 
+						result_left = op(result_left, c[left++]);			 
 					if (right % 2) 
-						res = op(res, c[--right]);
+						result_right = op(c[--right], result_right);
 				}	 
-				return res;
+				return op(result_left, result_right);
 			}		
 
 			/*
